@@ -3,7 +3,8 @@
 #================================
 
 #1. Leer el archivo omitiendo las líneas de la cabecera
-ruta_archivo <- "C:/UNI/PROGRAMACION/R/tasa_desempleo_1996_2026.csv"
+ruta_archivo <- "C:/UNI/VIII CICLO/SERIES DE TIEMPO/peru_macro_st/tasa_desempleo_1996_2026.csv"
+
 raw_data <- read.csv2(ruta_archivo, header = TRUE, dec = ".")
 raw_data
 attach(raw_data)

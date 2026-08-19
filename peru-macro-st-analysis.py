@@ -2,7 +2,7 @@
 #CARGAMOS LA DATA DESEMEPLEO EN PERÚ (2001 - 2026)
 #=================================================
 import pandas as pd
-ruta_archivo = "C:\\UNI\\PROGRAMACION\\R\\tasa_desempleo_1996_2026.csv"
+ruta_archivo = "C:\\UNI\\VIII CICLO\\SERIES DE TIEMPO\\peru_macro_st\\tasa_desempleo_1996_2026.csv"
 raw_data = pd.read_csv(ruta_archivo, sep = ";")
 type(raw_data)
 raw_data['Desempleo']
