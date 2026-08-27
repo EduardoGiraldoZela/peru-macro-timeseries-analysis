@@ -1,7 +1,7 @@
 #================================
 #TASA DE DESEMPLEO Perú 1996-2026
 #================================
-
+#Libro guía: Introductory Time Series with R - Paul S.P. Cowpertwait, Andrew V. Metcalfe – 1st Edition
 #1. Leer el archivo omitiendo las líneas de la cabecera
 ruta_archivo <- "C:/UNI/VIII CICLO/SERIES DE TIEMPO/peru_macro_st/tasa_desempleo_1996_2026.csv"
 
@@ -52,7 +52,7 @@ Aug.ratio
 #======================================================================
 #SERIES TEMPORALES MÚLTIPLES: electricidad, chocolate y cerveza en Perú
 #======================================================================
-cbe_peru <- read.csv2("C:/UNI/PROGRAMACION/R/cbe_peru.csv", header = TRUE, dec = ".")
+cbe_peru <- read.csv2("C:/UNI/VIII CICLO/SERIES DE TIEMPO/peru_macro_st/cbe_peru.csv", header = TRUE, dec = ".")
 head(cbe_peru)
 
 cbe_peru[1:4, ]
@@ -65,7 +65,7 @@ Elec.ts <- ts(cbe_peru[, "elec"], start = c(2001, 1), freq = 12)
 Choc.ts <- ts(cbe_peru[, "choc"], start = c(2001, 1), freq = 12)
 Beer.ts <- ts(cbe_peru[, "beer"], start = c(2001, 1), freq = 12)
 
-#Recortando hasta diciembre 2019
+#Recortando: Enero del 2021 hasta Dic del 2019)
 Elec.ts <- window(Elec.ts, end = c(2019, 12))
 Choc.ts <- window(Choc.ts, end = c(2019, 12))
 Beer.ts <- window(Beer.ts, end = c(2019, 12))
@@ -149,18 +149,25 @@ ts.plot(cbind(Trend, Trend * Seasonal), main = "Electricidad Perú: Tendencia vs
 acf(Elec1)$acf[2]
 acf(Elec1, type = c("covariance"))$acf[2]
 
+#===============================================
+# VISUALIZACIÓN COMPLETA Y SUBSECUENCIA DE SERIE
+#===============================================
+dev.off()
+plot(Elec1, col ="royalblue", lwd = 1.5) #Serie completa pre-pandemia
+plot(window(Elec1, end = c(2005, 12)), lwd = 1.5) #Zoom a los primeros 60 meses
 
+#==================================
+#DESCOMPOSICIÓN Y RESIDUOS DE ELEC1
+#==================================
 
+Elec1.decom <- decompose(Elec1, "additive")
+plot(na.omit(Elec1.decom))
 
+layout(1:2)
+plot(Elec.decom$random)
+acf(na.omit(Elec1.decom$random))
 
-
-
-
-
-
-
-
-
+sd(Elec1)
 
 
 

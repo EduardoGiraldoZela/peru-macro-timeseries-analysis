@@ -1,13 +1,14 @@
 #=================================================
 #CARGAMOS LA DATA DESEMEPLEO EN PERÚ (2001 - 2026)
 #=================================================
+#Libro guía: Introductory Time Series with R - Paul S.P. Cowpertwait, Andrew V. Metcalfe – 1st Edition
 import pandas as pd
 ruta_archivo = "C:\\UNI\\VIII CICLO\\SERIES DE TIEMPO\\peru_macro_st\\tasa_desempleo_1996_2026.csv"
 raw_data = pd.read_csv(ruta_archivo, sep = ";")
 type(raw_data)
 raw_data['Desempleo']
 
-#Convertimos la columna texto de fechaa formato DateTime real
+#Convertimos la columna texto de fecha formato DateTime real
 raw_data["Fecha"] = pd.to_datetime(raw_data["Fecha"], dayfirst = True)
 
 #Copia de la tabla original para no alterar
@@ -78,7 +79,8 @@ print(f"Aug_ratio: {Aug_ratio: .4f}")
 #SERIES DE TIEMPO MÚLTIPLE
 #=========================
 
-df_cbe = pd.read_csv("C:\\UNI\\PROGRAMACION\\R\\cbe_peru.csv", sep = ";")
+df_cbe = pd.read_csv("C:\\UNI\\VIII CICLO\\SERIES DE TIEMPO\\peru_macro_St\\cbe_peru.csv", sep = ";")
+
 print(df_cbe.head())
 
 df_cbe['Fecha'] = pd.to_datetime(df_cbe['Fecha'], dayfirst = True)
@@ -93,7 +95,7 @@ df_cbe_filtrado = df_cbe[df_cbe.index <= '2019-12-31']
 axes = df_cbe_filtrado[['elec', 'choc', 'beer']].plot(subplots = True,
                                              figsize = (10, 8),
                                              sharex = True,
-                                             color = 'darkblue',
+                                             color = 'green',
                                              linewidth = 1.5)
 plt.suptitle("Producción Industrial CBE Perú (2001 - 2026)", y = 0.96,
              fontsize = 14)
@@ -209,3 +211,59 @@ valores_acov = sm.tsa.stattools.acovf(df_pre_pand['elec'], adjusted = False, fft
 print(f"Autocorrelación en Lag 1: {valores_acf[1]:.4f}")
 print(f"Autocovarianza en Lag 1: {valores_acov[1]:.4f}")
 print(f"Varianza de la serie (Lag 0): {valores_acov[0]: .4f}")
+
+#==============================================
+#VISUALIZACIÓN COMPLETA Y SUBSECUENCIA DE SERIE
+#==============================================
+fig, axes = plt.subplots(2, 1, figsize = (10, 8))
+
+axes[0].plot(df_pre_pand['elec'].index, df_pre_pand['elec'], color = "royalblue", linewidth = 1.5)
+axes[0].set_title("Serie completa")
+axes[0].set_ylabel("IVF")
+axes[0].grid(True, linestyle = ":", alpha = 0.6)
+
+subserie_60 = df_pre_pand['elec'].iloc[0:60]
+axes[1].plot(subserie_60.index, subserie_60, color = "darkblue", linewidth = 1.5)
+axes[1].set_title("Subserie: Primeros 60 meses")
+axes[1].set_xlabel("Años")
+axes[1].set_ylabel('VIF')
+axes[1].grid(True, linestyle = ":", alpha = 0.6)
+
+plt.tight_layout()
+plt.show()
+
+#=============================================
+#DESCOMPOSICIÓN ADITIVA Y ANÁLISIS DE RESIDUOS
+#=============================================
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.graphics.tsaplots import plot_acf
+
+#Descomposición aditiva
+Elec1_decom_adit = seasonal_decompose(elec_vec, model = 'additive', period = 12)
+#Cálculo de desviaciones estándar en la misma escala aditiva
+sd_sin_tendencia = (elec_vec.iloc[6:218] - Elec1_decom_adit.trend.iloc[6:218]).std()
+sd_ruido = Elec1_decom_adit.resid.iloc[6:218].std()
+
+print(f"sd sin tendencia: {sd_sin_tendencia: .4f}")
+print(f"sd ruido aditivo: {sd_ruido: .4f}")
+
+#Gráficas
+fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+axes[0].plot(Elec1_decom_adit.resid.iloc[6:218].index, Elec1_decom_adit.resid.iloc[6:218], color = "darkblue", linewidth = 1.2)
+axes[0].set_title("Componente Aleatorio Aditivo - Elec Perú")
+axes[0].grid(True, linestyle = ":", alpha = 0.6)
+
+plot_acf(Elec1_decom_adit.resid.iloc[6:218], lags = 24, ax = axes[1])
+axes[1].set_title("ACF de Residuos Aditivos")
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
